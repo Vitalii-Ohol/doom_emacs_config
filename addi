@@ -1,6 +1,0 @@
-emacs --daemon
-
-alias e='emacsclient'
-alias v='emacsclient'
-alias em='emacsclient'
-alias ema='emacsclient'
