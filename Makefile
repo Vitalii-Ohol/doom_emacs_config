@@ -37,7 +37,7 @@ clean: ## clean this config
 	@if [ -d $$HOME/.doom.d ]; then \
 		rm -rf $$HOME/.doom.d; \
 	fi
-	# sudo apt purge emacs emacs-gtk emacs-nox -y
+	sudo apt purge emacs emacs-gtk emacs-nox
 
 help: ## this help window
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
