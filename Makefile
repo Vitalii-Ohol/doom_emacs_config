@@ -11,7 +11,9 @@ app: ## install emacs-nox and doom-emacs
 		$$HOME/.emacs.d/bin/doom install; \
 	fi
 
-dotfiles: ## install config files
+dotfiles: config refresh ## configure and pack all packages
+
+config: ## install config files
 	@echo "HOME:  $(HOME)";
 	@echo "PWD    $(PWD)";
 	# === DOTFILES-DIRS ===
@@ -26,6 +28,8 @@ dotfiles: ## install config files
 			| sed s:"$(PWD)/"::); do \
 		ln -sf $(PWD)/$$file $(HOME)/$$file; \
 	done;
+
+refresh: ## refresh config setup and pack it
 	$$HOME/.emacs.d/bin/doom refresh
 	$$HOME/.emacs.d/bin/doom purge -g
 
