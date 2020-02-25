@@ -4,6 +4,7 @@
 ;; ripgrep - for deadgrep and doom-emacs overall
 ;; devscripts - for checkbashism
 
+
 (defun move-line-up ()
   "Move up the current line."
   (interactive)
@@ -228,19 +229,6 @@
     ;; Add a kill action to DOOM's buffer switching
     (ivy-set-actions '+ivy/switch-workspace-buffer '(("k" kill-buffer "kill"))))
 
-;; eshell
-(use-package eshell
-  :defer t
-  :config
-    (set-eshell-alias!
-        "f"   "find-file $1"
-        "l"   "ls -lh"
-        "d"   "dired $1"
-        "gl"  "(call-interactively 'magit-log-current)"
-        "gs"  "magit-status"
-        "gc"  "magit-commit"
-        "rg"  "rg --color=always $*"))
-
 ;; Projectile
 (use-package projectile
   :config
@@ -259,20 +247,21 @@
     (setq yas-snippet-dirs
         '("~/.doom.d/snippets"                 ;; personal snippets
     ))
-    ;; Remove Yasnippet's default tab key binding
-    (define-key yas-minor-mode-map (kbd "<tab>") nil)
-    (define-key yas-minor-mode-map (kbd "TAB") nil)
-    ;; Alternatively use Control-c + tab
-    (define-key yas-minor-mode-map (kbd "\C-c TAB") 'yas-expand)
+;;;    ;; Remove Yasnippet's default tab key binding
+;;;    (define-key yas-minor-mode-map (kbd "<tab>") nil)
+;;;    (define-key yas-minor-mode-map (kbd "TAB") nil)
+;;;    ;; Alternatively use Control-c + tab
+;;;    (define-key yas-minor-mode-map (kbd "\C-c TAB") 'yas-expand)
     (set-face-background 'secondary-selection "gray")
   :commands (yas-global-mode))
 
 ;; completion
 (use-package company
+  :after yasnippet
   :config
-    (setq company-selection-wrap-around t
+    (setq company-selection-wrap-around nil
           ;; do or don't automatically start completion after <idle time>
-          company-idle-delay 0.2
+          company-idle-delay 0.1
           ;; at least 1 letters need to be there though
           company-minimum-prefix-length 1
           ;; show completion numbers for hotkeys
@@ -297,7 +286,7 @@
       :documentation #'helpful-at-point)
     (company-quickhelp-mode)
     (setq company-quickhelp-delay 0.1)
-    (global-company-mode +1))
+    (global-company-mode))
 
 ;; lsp
 (use-package lsp-mode

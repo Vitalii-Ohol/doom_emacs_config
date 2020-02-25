@@ -89,7 +89,7 @@
 (doom!  :input
         :completion
           (company               ; the ultimate code completion backend
-              +tng
+              ;; +tng
               +auto
               +childframe)       ; a nicer company UI. Emacs +26 only!
           (ivy
