@@ -84,7 +84,7 @@
         doom-modeline-enable-word-count t
         doom-modeline-checker-simple-format t
         doom-modeline-persp-name t
-        doom-modeline-lsp t
+        ; doom-modeline-lsp t
         doom-modeline-mode t
         doom-modeline-indent-info t
         ; doom-modeline-unicode-fallback t
@@ -256,6 +256,18 @@
   :commands (yas-global-mode))
 
 ;; completion
+; (use-package company-jedi
+;   :config
+;     (setq jedi:environment-virtualenv (list (expand-file-name "~/.py_workspace/")))
+;     (add-hook 'python-mode-hook 'jedi:setup)
+;     (setq jedi:complete-on-dot t)
+;     (setq jedi:use-shortcuts t)
+;     (defun config/enable-company-jedi ()
+;       (add-to-list 'company-backends 'company-jedi))
+;     (add-hook 'python-mode-hook 'config/enable-company-jedi)
+; )
+(add-hook 'python-mode-hook 'anaconda-mode)
+
 (use-package company
   :after yasnippet
   :config
@@ -277,11 +289,11 @@
           ;; company-dabbrev-code-other-buffers t
           )
     (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-files company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(python-mode) '(company-lsp company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(python-mode) '(company-anaconda company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(org-mode) '(company-capf company-files company-yasnippet company-dabbrev))
-    (set-lookup-handlers! 'python-mode
-      :definition #'lsp-ui-peek-find-definitions
-      :references #'lsp-ui-peek-find-references)
+;     (set-lookup-handlers! 'python-mode
+;       :definition #'lsp-ui-peek-find-definitions
+;       :references #'lsp-ui-peek-find-references)
     (set-lookup-handlers! 'emacs-lisp-mode
       :documentation #'helpful-at-point)
     (company-quickhelp-mode)
@@ -289,57 +301,57 @@
     (global-company-mode))
 
 ;; lsp
-(use-package lsp-mode
-  ;;:after which-key
-  :hook
-    (prog-mode . lsp)
-    (reason-mode . lsp)
-    ;; which-key integration
-    ;;(lsp-mode . lsp-enable-which-key-integration)
-  :config
-    (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection "reason-language-server")
-                      :major-modes '(reason-mode)
-                      :notification-handlers (ht ("client/registerCapability" 'ignore))
-                      :priority 1
-                      :server-id 'reason-ls))
-    (setq lsp-response-timeout 25)
-    (evil-set-command-property 'lsp-goto-type-definition :jump t)
-    (evil-set-command-property 'lsp-goto-implementation :jump t)
-  :commands lsp)
-(use-package lsp-ui
-  :after lsp-mode
-  :hook (lsp-mode . lsp-ui-mode)
-  :config
-    (setq lsp-ui-doc-enable nil
-          lsp-ui-doc-delay 0.1
-          lsp-ui-doc-include-signature t
-          lsp-ui-doc-position 'at-point
-          lsp-ui-doc-max-width 65
-          lsp-ui-doc-max-height 70
-          ;;lsp-ui-doc-border "#fdf5b1"
-          lsp-ui-doc-use-childframe t
-
-          lsp-ui-sideline-enable t
-          lsp-ui-sideline-ignore-duplicate t
-          lsp-ui-sideline-show-hover t
-          lsp-ui-sideline-show-symbol t
-
-          lsp-ui-peek-enable nil
-
-          lsp-ui-flycheck-enable 1)
-    (add-to-list 'lsp-ui-doc-frame-parameters '(left-fringe . 0))
-  :commands lsp-ui-mode)
-(use-package company-lsp
-  :after (lsp-mode)
-  :config
-      (add-to-list 'company-backends 'company-lsp)
-      (setq company-lsp-enable-snippet t
-            company-lsp-cache-candidates t)
-  :commands company-lsp)
-(use-package lsp-ivy
-  :after ivy
-  :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-mode
+;;   ;;:after which-key
+;;   :hook
+;;     (prog-mode . lsp)
+;;     (reason-mode . lsp)
+;;     ;; which-key integration
+;;     ;;(lsp-mode . lsp-enable-which-key-integration)
+;;   :config
+;;     (lsp-register-client
+;;     (make-lsp-client :new-connection (lsp-stdio-connection "reason-language-server")
+;;                       :major-modes '(reason-mode)
+;;                       :notification-handlers (ht ("client/registerCapability" 'ignore))
+;;                       :priority 1
+;;                       :server-id 'reason-ls))
+;;     (setq lsp-response-timeout 5)
+;;     (evil-set-command-property 'lsp-goto-type-definition :jump t)
+;;     (evil-set-command-property 'lsp-goto-implementation :jump t)
+;;   :commands lsp)
+;; (use-package lsp-ui
+;;   :after lsp-mode
+;;   :hook (lsp-mode . lsp-ui-mode)
+;;   :config
+;;     (setq lsp-ui-doc-enable nil
+;;           lsp-ui-doc-delay 0.1
+;;           lsp-ui-doc-include-signature t
+;;           lsp-ui-doc-position 'at-point
+;;           lsp-ui-doc-max-width 65
+;;           lsp-ui-doc-max-height 70
+;;           ;;lsp-ui-doc-border "#fdf5b1"
+;;           lsp-ui-doc-use-childframe t
+;;
+;;           lsp-ui-sideline-enable t
+;;           lsp-ui-sideline-ignore-duplicate t
+;;           lsp-ui-sideline-show-hover t
+;;           lsp-ui-sideline-show-symbol t
+;;
+;;           lsp-ui-peek-enable nil
+;;
+;;           lsp-ui-flycheck-enable 1)
+;;     (add-to-list 'lsp-ui-doc-frame-parameters '(left-fringe . 0))
+;;   :commands lsp-ui-mode)
+;; (use-package company-lsp
+;;   :after (lsp-mode)
+;;   :config
+;;       (add-to-list 'company-backends 'company-lsp)
+;;       (setq company-lsp-enable-snippet t
+;;             company-lsp-cache-candidates t)
+;;   :commands company-lsp)
+;; (use-package lsp-ivy
+;;   :after ivy
+;;   :commands lsp-ivy-workspace-symbol)
 ;; (use-package lsp-treemacs
 ;;   :after treemacs
 ;;   ;;:init (add-hook! 'treemacs-mode-hook #'lsp-treemacs-symbols)
@@ -386,16 +398,15 @@
     (add-hook! 'flycheck-mode-hook #'flycheck-pycheckers-setup))
 
 ;; org
-(use-package org
-  :config
-    (setq org-directory "~/Documents/org"
-          org-archive-location "~/Documents/org-archive"
-          org-ellipsis " ▼ "
-          org-bullets-bullet-list '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷" "☷" "☷" "☷")
-          org-tags-column 80)
-    (add-to-list 'org-modules 'org-habit t)
-  :commands (org-mode))
-
+;; (use-package org
+;;   :config
+;;     (setq org-directory "~/Documents/org"
+;;           org-archive-location "~/Documents/org-archive"
+;;           org-ellipsis " ▼ "
+;;           org-bullets-bullet-list '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷" "☷" "☷" "☷")
+;;           org-tags-column 80)
+;;     (add-to-list 'org-modules 'org-habit t)
+;;   :commands (org-mode))
 
 
 

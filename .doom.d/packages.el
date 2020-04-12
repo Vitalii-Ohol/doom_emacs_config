@@ -5,14 +5,15 @@
 (package! lsp-python-ms :disable t)
 (package! eshell :disable t)
 (package! treemacs :disable t)
-(package! lsp-treemacs :disable t)
+(package! lsp :disable t)
+(package! lsp-ui :disable t)
+(package! lsp-ivy :disable t)
+(package! company-lsp :disable t)
 
 (package! benchmark-init)
 (package! company-quickhelp)
 (package! undo-tree)
 (package! imenu-list)
-
-; (package! blacken)
 
 ;; For personal modeline
 (package! anzu)
@@ -21,13 +22,3 @@
 ;; flyckeck for back and python
 (package! flycheck-pycheckers)
 (package! flycheck-checkbashisms)
-
-
-;; (package! lsp-java)
-;; (package! move-text)
-;; (package! sql-indent)
-;; (package! deadgrep)
-;; (package! jupyter)
-;; (package! org-super-agenda)
-;; (package! ivy-postframe)
-;; (package! emms)
