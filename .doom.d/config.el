@@ -170,33 +170,33 @@
   (sp-local-pair 'js-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
 
 ;; tree sctructure panel
-(use-package treemacs
-  :config
-    (semantic-mode)
-    (setq-local imenu-create-index-function 'semantic-create-imenu-index-1)
-    (setq
-          treemacs-no-png-images t
-          treemacs-tag-follow-mode t
-          treemacs-tag-follow-cleanup t
-          treemacs-goto-tag-strategy 'refetch-index)
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode t)
-    (treemacs-create-theme "TESTING"
-      :icon-directory ""
-      :config
-        (progn
-          ; ⌥  ⎇
-          (treemacs-create-icon :file "j.png"   :fallback "⌥ " :extensions (root))
-          (treemacs-create-icon :file "j.png" :fallback "🗀 " :extensions (dir-closed))
-          (treemacs-create-icon :file "j.png" :fallback "🗁 " :extensions (dir-open))
-          (treemacs-create-icon :file "j.png" :fallback "◉ " :extensions (tag-closed))
-          (treemacs-create-icon :file "j.png" :fallback "◎ " :extensions (tag-open))
-          (treemacs-create-icon :file "j.png" :fallback "~ " :extensions (tag-leaf))
-          (treemacs-create-icon :file "j.png" :fallback "🗎  " :extensions (fallback))
-          ))
-    (treemacs-load-theme "TESTING")
-  )
+;; (use-package treemacs
+;;   :config
+;;     (semantic-mode)
+;;     (setq-local imenu-create-index-function 'semantic-create-imenu-index-1)
+;;     (setq
+;;           treemacs-no-png-images t
+;;           treemacs-tag-follow-mode t
+;;           treemacs-tag-follow-cleanup t
+;;           treemacs-goto-tag-strategy 'refetch-index)
+;;     (treemacs-follow-mode t)
+;;     (treemacs-filewatch-mode t)
+;;     (treemacs-fringe-indicator-mode t)
+;;     (treemacs-create-theme "TESTING"
+;;       :icon-directory ""
+;;       :config
+;;         (progn
+;;           ; ⌥  ⎇
+;;           (treemacs-create-icon :file "j.png"   :fallback "⌥ " :extensions (root))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗀 " :extensions (dir-closed))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗁 " :extensions (dir-open))
+;;           (treemacs-create-icon :file "j.png" :fallback "◉ " :extensions (tag-closed))
+;;           (treemacs-create-icon :file "j.png" :fallback "◎ " :extensions (tag-open))
+;;           (treemacs-create-icon :file "j.png" :fallback "~ " :extensions (tag-leaf))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗎  " :extensions (fallback))
+;;           ))
+;;     (treemacs-load-theme "TESTING")
+;;   )
 
 ;; Larger undo tree window
 (use-package undo-tree
@@ -340,11 +340,11 @@
 (use-package lsp-ivy
   :after ivy
   :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs
-  :after treemacs
-  ;;:init (add-hook! 'treemacs-mode-hook #'lsp-treemacs-symbols)
-  :config (lsp-treemacs-sync-mode 1)
-  )
+;; (use-package lsp-treemacs
+;;   :after treemacs
+;;   ;;:init (add-hook! 'treemacs-mode-hook #'lsp-treemacs-symbols)
+;;   :config (lsp-treemacs-sync-mode 1)
+;;   )
 
 ;;flycheck
 (use-package flycheck

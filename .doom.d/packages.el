@@ -4,6 +4,8 @@
 (package! doom-snippets :disable t)
 (package! lsp-python-ms :disable t)
 (package! eshell :disable t)
+(package! treemacs :disable t)
+(package! lsp-treemacs :disable t)
 
 (package! benchmark-init)
 (package! company-quickhelp)
