@@ -151,7 +151,7 @@
             +dictionary
             +offline
             +docsets)            ; ...or in Dash docsets locally
-          ;;lsp
+          lsp
           magit                  ; a git porcelain for Emacs
           ;;make                   ; run make tasks from Emacs
           ;;(org +present)
@@ -163,11 +163,11 @@
           emacs-lisp             ; drown in parentheses
           ;;(java +meghanada)    ; the poster child for carpal tunnel syndrome
           ;;(latex +latexmk)     ; writing papers in Emacs has never been so fun
-          (python )
+          (python +lsp)
           ;;lua                  ; one-based indices? one-based indices
           ;;markdown             ; writing docs for people to ignore
           ;;scheme               ; a fully conniving family of lisps
-          (sh)              ; she sells {ba,z,fi}sh shells on the C xor
+          (sh +lsp)              ; she sells {ba,z,fi}sh shells on the C xor
 
         :email
           ;;(mu4e +gmail)

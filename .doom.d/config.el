@@ -1,10 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; elpa-flycheck flycheck-doc - for flycheck
-;; ripgrep - for deadgrep and doom-emacs overall
-;; devscripts - for checkbashism
-
-
 (defun move-line-up ()
   "Move up the current line."
   (interactive)
@@ -84,7 +79,7 @@
         doom-modeline-enable-word-count t
         doom-modeline-checker-simple-format t
         doom-modeline-persp-name t
-        ; doom-modeline-lsp t
+        doom-modeline-lsp t
         doom-modeline-mode t
         doom-modeline-indent-info t
         ; doom-modeline-unicode-fallback t
@@ -169,34 +164,6 @@
   (sp-local-pair 'typescript-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
   (sp-local-pair 'js-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
 
-;; tree sctructure panel
-;; (use-package treemacs
-;;   :config
-;;     (semantic-mode)
-;;     (setq-local imenu-create-index-function 'semantic-create-imenu-index-1)
-;;     (setq
-;;           treemacs-no-png-images t
-;;           treemacs-tag-follow-mode t
-;;           treemacs-tag-follow-cleanup t
-;;           treemacs-goto-tag-strategy 'refetch-index)
-;;     (treemacs-follow-mode t)
-;;     (treemacs-filewatch-mode t)
-;;     (treemacs-fringe-indicator-mode t)
-;;     (treemacs-create-theme "TESTING"
-;;       :icon-directory ""
-;;       :config
-;;         (progn
-;;           ; ⌥  ⎇
-;;           (treemacs-create-icon :file "j.png"   :fallback "⌥ " :extensions (root))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗀 " :extensions (dir-closed))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗁 " :extensions (dir-open))
-;;           (treemacs-create-icon :file "j.png" :fallback "◉ " :extensions (tag-closed))
-;;           (treemacs-create-icon :file "j.png" :fallback "◎ " :extensions (tag-open))
-;;           (treemacs-create-icon :file "j.png" :fallback "~ " :extensions (tag-leaf))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗎  " :extensions (fallback))
-;;           ))
-;;     (treemacs-load-theme "TESTING")
-;;   )
 
 ;; Larger undo tree window
 (use-package undo-tree
@@ -234,10 +201,6 @@
   :config
     (setq projectile-require-project-root t)
     (setq projectile-create-missing-test-files t)
-;;     (projectile-register-project-type 'haskell-stack '("stack.yaml")
-;;                                       :compile "stack build"
-;;                                       :test "stack build --test"
-;;                                       :test-suffix "Test")
     (projectile-mode)
     (projectile-load-known-projects))
 
@@ -255,19 +218,6 @@
     (set-face-background 'secondary-selection "gray")
   :commands (yas-global-mode))
 
-;; completion
-; (use-package company-jedi
-;   :config
-;     (setq jedi:environment-virtualenv (list (expand-file-name "~/.py_workspace/")))
-;     (add-hook 'python-mode-hook 'jedi:setup)
-;     (setq jedi:complete-on-dot t)
-;     (setq jedi:use-shortcuts t)
-;     (defun config/enable-company-jedi ()
-;       (add-to-list 'company-backends 'company-jedi))
-;     (add-hook 'python-mode-hook 'config/enable-company-jedi)
-; )
-(add-hook 'python-mode-hook 'anaconda-mode)
-
 (use-package company
   :after yasnippet
   :config
@@ -284,16 +234,14 @@
           company-tooltip-align-annotations t
           company-search-regexp-function #'company-search-flex-regexp
           company-require-match nil
-          ;; company-dabbrev-downcase nil
-          ;; company-dabbrev-ignore-case nil
-          ;; company-dabbrev-code-other-buffers t
           )
     (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-files company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(python-mode) '(company-anaconda company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(python-mode) '(company-lsp company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(sh-mode) '(company-capf company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(org-mode) '(company-capf company-files company-yasnippet company-dabbrev))
-;     (set-lookup-handlers! 'python-mode
-;       :definition #'lsp-ui-peek-find-definitions
-;       :references #'lsp-ui-peek-find-references)
+    (set-lookup-handlers! 'python-mode
+      :definition #'lsp-ui-peek-find-definitions
+      :references #'lsp-ui-peek-find-references)
     (set-lookup-handlers! 'emacs-lisp-mode
       :documentation #'helpful-at-point)
     (company-quickhelp-mode)
@@ -301,62 +249,48 @@
     (global-company-mode))
 
 ;; lsp
-;; (use-package lsp-mode
-;;   ;;:after which-key
-;;   :hook
-;;     (prog-mode . lsp)
-;;     (reason-mode . lsp)
-;;     ;; which-key integration
-;;     ;;(lsp-mode . lsp-enable-which-key-integration)
-;;   :config
-;;     (lsp-register-client
-;;     (make-lsp-client :new-connection (lsp-stdio-connection "reason-language-server")
-;;                       :major-modes '(reason-mode)
-;;                       :notification-handlers (ht ("client/registerCapability" 'ignore))
-;;                       :priority 1
-;;                       :server-id 'reason-ls))
-;;     (setq lsp-response-timeout 5)
-;;     (evil-set-command-property 'lsp-goto-type-definition :jump t)
-;;     (evil-set-command-property 'lsp-goto-implementation :jump t)
-;;   :commands lsp)
-;; (use-package lsp-ui
-;;   :after lsp-mode
-;;   :hook (lsp-mode . lsp-ui-mode)
-;;   :config
-;;     (setq lsp-ui-doc-enable nil
-;;           lsp-ui-doc-delay 0.1
-;;           lsp-ui-doc-include-signature t
-;;           lsp-ui-doc-position 'at-point
-;;           lsp-ui-doc-max-width 65
-;;           lsp-ui-doc-max-height 70
-;;           ;;lsp-ui-doc-border "#fdf5b1"
-;;           lsp-ui-doc-use-childframe t
-;;
-;;           lsp-ui-sideline-enable t
-;;           lsp-ui-sideline-ignore-duplicate t
-;;           lsp-ui-sideline-show-hover t
-;;           lsp-ui-sideline-show-symbol t
-;;
-;;           lsp-ui-peek-enable nil
-;;
-;;           lsp-ui-flycheck-enable 1)
-;;     (add-to-list 'lsp-ui-doc-frame-parameters '(left-fringe . 0))
-;;   :commands lsp-ui-mode)
-;; (use-package company-lsp
-;;   :after (lsp-mode)
-;;   :config
-;;       (add-to-list 'company-backends 'company-lsp)
-;;       (setq company-lsp-enable-snippet t
-;;             company-lsp-cache-candidates t)
-;;   :commands company-lsp)
-;; (use-package lsp-ivy
-;;   :after ivy
-;;   :commands lsp-ivy-workspace-symbol)
-;; (use-package lsp-treemacs
-;;   :after treemacs
-;;   ;;:init (add-hook! 'treemacs-mode-hook #'lsp-treemacs-symbols)
-;;   :config (lsp-treemacs-sync-mode 1)
-;;   )
+(use-package lsp-mode
+  :hook
+    (prog-mode . lsp)
+    (reason-mode . lsp)
+  :config
+    (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection "reason-language-server")
+                      :major-modes '(reason-mode)
+                      :notification-handlers (ht ("client/registerCapability" 'ignore))
+                      :priority 1
+                      :server-id 'reason-ls))
+    (setq lsp-response-timeout 5)
+    (evil-set-command-property 'lsp-goto-type-definition :jump t)
+    (evil-set-command-property 'lsp-goto-implementation :jump t)
+  :commands lsp)
+(use-package lsp-ui
+  :after lsp-mode
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+    (setq lsp-ui-doc-enable nil
+          lsp-ui-doc-delay 0.1
+          lsp-ui-doc-include-signature t
+          lsp-ui-doc-position 'at-point
+          lsp-ui-doc-max-width 65
+          lsp-ui-doc-max-height 70
+          ;;lsp-ui-doc-border "#fdf5b1"
+          lsp-ui-doc-use-childframe t
+          lsp-ui-sideline-enable t
+          lsp-ui-sideline-ignore-duplicate t
+          lsp-ui-sideline-show-hover t
+          lsp-ui-sideline-show-symbol t
+          lsp-ui-peek-enable nil
+          lsp-ui-flycheck-enable 1)
+    (add-to-list 'lsp-ui-doc-frame-parameters '(left-fringe . 0))
+  :commands lsp-ui-mode)
+(use-package company-lsp
+  :after (lsp-mode)
+  :config
+      (add-to-list 'company-backends 'company-lsp)
+      (setq company-lsp-enable-snippet t
+            company-lsp-cache-candidates t)
+  :commands company-lsp)
 
 ;;flycheck
 (use-package flycheck
@@ -385,7 +319,6 @@
     (flycheck-checkbashisms-setup)
     ;; Check 'echo -n' usage
     (setq flycheck-checkbashisms-newline t)
-
     ;; Check non-POSIX issues but required to be supported by Debian Policy 10.4
     ;; Setting this variable to non nil made flycheck-checkbashisms-newline effects
     ;; regardless of its value
@@ -396,6 +329,14 @@
     (setq flycheck-pycheckers-checkers '(flake8 pylint pyflakes mypy3 bandit pep8)
           flycheck-pycheckers-max-line-length 79)
     (add-hook! 'flycheck-mode-hook #'flycheck-pycheckers-setup))
+
+
+
+
+
+
+
+
 
 ;; org
 ;; (use-package org
@@ -409,58 +350,34 @@
 ;;   :commands (org-mode))
 
 
+;; (add-hook 'python-mode-hook 'anaconda-mode)
 
 
-
-;; python
-;; (use-package blacken
-;;   :hook (python-mode . blacken-mode))
-
-
-
-;; python
-;; (after! python
-;;   (setq python-shell-interpreter "python3"
-;;         pippel-python-command "python3"
-;;         py-python-command "python3"
-;;         importmagic-python-interpreter "python3"))
-;;
-;; (setq hs-special-modes-alist
-;;           (append
-;;            '((prog-mode "{{{" "}}}" "\"")
-;;              (yaml-mode "\\s-*\\_<\\(?:[^:]+\\)\\_>"
-;;                         ""
-;;                         "#"
-;;                         +hideshow-forward-block-by-indent nil)
-;;              (haml-mode "[#.%]" "\n" "/" +hideshow-haml-forward-sexp nil)
-;;              (ruby-mode "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
-;;                         "end\\|[]}]"
-;;                         "#\\|=begin"
-;;                         ruby-forward-sexp)
-;;              (enh-ruby-mode "class\\|d\\(?:ef\\|o\\)\\|module\\|[[{]"
-;;                             "end\\|[]}]"
-;;                             "#\\|=begin"
-;;                             enh-ruby-forward-sexp nil)
-;;              (matlab-mode "if\\|switch\\|case\\|otherwise\\|while\\|for\\|try\\|catch"
-;;                           "end"
-;;                           nil (lambda (_arg) (matlab-forward-sexp))))
-;;            hs-special-modes-alist
-;;            '((t))))
-;;
-;;
-;; jupyter
-;; (use-package! jupyter
-;;   :after org
-;;   :init
-;;   ;; use overlays in jupyter-scratch to show evaluation results
-;;   (setq jupyter-eval-use-overlays t)
+;; tree sctructure panel
+;; (use-package treemacs
 ;;   :config
-;;   (after! ob-async
-;;     (add-to-list 'ob-async-no-async-languages-alist "jupyter-python"))
-;;   (org-babel-do-load-languages
-;;    'org-babel-load-languages
-;;    '((emacs-lisp . t)
-;;      (python . t)
-;;      (jupyter . t))))
-;;
-;;
+;;     (semantic-mode)
+;;     (setq-local imenu-create-index-function 'semantic-create-imenu-index-1)
+;;     (setq
+;;           treemacs-no-png-images t
+;;           treemacs-tag-follow-mode t
+;;           treemacs-tag-follow-cleanup t
+;;           treemacs-goto-tag-strategy 'refetch-index)
+;;     (treemacs-follow-mode t)
+;;     (treemacs-filewatch-mode t)
+;;     (treemacs-fringe-indicator-mode t)
+;;     (treemacs-create-theme "TESTING"
+;;       :icon-directory ""
+;;       :config
+;;         (progn
+;;           ; ⌥  ⎇
+;;           (treemacs-create-icon :file "j.png"   :fallback "⌥ " :extensions (root))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗀 " :extensions (dir-closed))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗁 " :extensions (dir-open))
+;;           (treemacs-create-icon :file "j.png" :fallback "◉ " :extensions (tag-closed))
+;;           (treemacs-create-icon :file "j.png" :fallback "◎ " :extensions (tag-open))
+;;           (treemacs-create-icon :file "j.png" :fallback "~ " :extensions (tag-leaf))
+;;           (treemacs-create-icon :file "j.png" :fallback "🗎  " :extensions (fallback))
+;;           ))
+;;     (treemacs-load-theme "TESTING")
+;;   )

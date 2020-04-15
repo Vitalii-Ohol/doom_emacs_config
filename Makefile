@@ -1,11 +1,11 @@
-.PHONY: all install app dotfiles clean help
+.PHONY: all install app dotfiles clean config refresh help
 
 all: clean install ## clean previous setup and install this
 
 install: app dotfiles ## install apps and configs
 
 app: ## install emacs-nox and doom-emacs
-	sudo apt install emacs-nox ripgrep git -y
+	sudo apt install emacs-nox ripgrep git devscripts elpa-flycheck flycheck-doc -y
 	@if [ ! -d $$HOME/.emacs.d ]; then \
 		git clone https://github.com/hlissner/doom-emacs $$HOME/.emacs.d; \
 		$$HOME/.emacs.d/bin/doom install; \

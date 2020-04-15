@@ -5,10 +5,8 @@
 (package! lsp-python-ms :disable t)
 (package! eshell :disable t)
 (package! treemacs :disable t)
-(package! lsp :disable t)
-(package! lsp-ui :disable t)
 (package! lsp-ivy :disable t)
-(package! company-lsp :disable t)
+; (package! lsp-ui :disable t)
 
 (package! benchmark-init)
 (package! company-quickhelp)
