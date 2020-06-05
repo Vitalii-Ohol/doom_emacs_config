@@ -30,7 +30,7 @@ config: ## install config files
 	done;
 
 refresh: ## refresh config setup and pack it
-	$$HOME/.emacs.d/bin/doom refresh
+	$$HOME/.emacs.d/bin/doom sync
 	$$HOME/.emacs.d/bin/doom purge -g
 
 

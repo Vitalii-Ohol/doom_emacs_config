@@ -18,17 +18,14 @@
 
 (global-set-key (kbd "M-k") 'move-line-up)
 (global-set-key (kbd "M-j") 'move-line-down)
+(global-set-key (kbd "C-/") 'comment-or-uncomment-region)
 
 
 (setq use-package-verbose t
       use-package-compute-statistics t)
 
-;; editor evil
-(setq evil-split-window-below t
-      evil-vsplit-window-right t)
-
-;; (after! evil-escape
-;;   (setq evil-escape-key-sequence "jk"))
+(after! evil-escape
+   (setq evil-escape-key-sequence "jk"))
 
 ;; benchmark
 (use-package benchmark-init
@@ -146,8 +143,31 @@
     ;; Scrolling commands do not cancel isearch
     (setq isearch-allow-scroll t))
 
+(use-package iedit
+  :config
+    (map! :leader
+        (:prefix ("r" . "Remove/Replace")
+          :desc "Iedit" "i" 'iedit-mode
+          :desc "Iedit quit" "q" 'iedit-quit
+          :desc "Iedit quit" "t" 'iedit-toggle-selection
+        )))
+
 ;; smartparens
 (after! smartparens
+  (map! :leader
+      (:prefix ("i" . "Insert")
+        :desc "Wrap round" "(" 'sp-wrap-round
+        :desc "Wrap round" ")" 'sp-wrap-round
+        :desc "Wrap curly" "{" 'sp-wrap-curly
+        :desc "Wrap curly" "}" 'sp-wrap-curly
+        :desc "Wrap square" "[" 'sp-wrap-square
+        :desc "Wrap square" "]" 'sp-wrap-square
+      ))
+  (map! :leader
+      (:prefix ("r" . "Remove/Replace")
+        :desc "Wrap" "w" 'sp-unwrap-sexp
+        :desc "Rewrap" "r" 'sp-rewrap-sexp
+      ))
   (sp-use-paredit-bindings)
   (setq sp-escape-quotes-after-insert t)
   (defun my-create-newline-and-enter-sexp (&rest _ignored)
@@ -163,7 +183,6 @@
   (sp-local-pair 'web-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
   (sp-local-pair 'typescript-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
   (sp-local-pair 'js-mode "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
-
 
 ;; Larger undo tree window
 (use-package undo-tree
@@ -237,6 +256,7 @@
           )
     (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(python-mode) '(company-lsp company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(haskell-mode) '(company-ghci company-yasnippet company-dabbrev-code))
     (set-company-backend! '(sh-mode) '(company-capf company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(org-mode) '(company-capf company-files company-yasnippet company-dabbrev))
     (set-lookup-handlers! 'python-mode
@@ -312,6 +332,7 @@
                 line-end))
           :modes (text-mode markdown-mode gfm-mode org-mode))
     (add-to-list 'flycheck-checkers 'proselint)
+    ;; 'haskell-hlint 'sh-posix-bash 'sh-checkbashisms 'sh-shellcheck)
     (setq flycheck-check-syntax-automatically '(mode-enabled save)))
 (use-package flycheck-checkbashisms
   :after flycheck
@@ -330,54 +351,47 @@
           flycheck-pycheckers-max-line-length 79)
     (add-hook! 'flycheck-mode-hook #'flycheck-pycheckers-setup))
 
-
-
-
-
-
-
-
-
 ;; org
-;; (use-package org
-;;   :config
-;;     (setq org-directory "~/Documents/org"
-;;           org-archive-location "~/Documents/org-archive"
-;;           org-ellipsis " ▼ "
-;;           org-bullets-bullet-list '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷" "☷" "☷" "☷")
-;;           org-tags-column 80)
-;;     (add-to-list 'org-modules 'org-habit t)
-;;   :commands (org-mode))
+(use-package org
+  :config
+    (setq org-directory "~/Dropbox/Apps/Orgzly"
+          org-agenda-files (list org-directory)
+          org-archive-location "~/Dropbox/Apps/Orgzly/Archive"
+          org-ellipsis " ▼ "
+          org-bullets-bullet-list '("◉", "◎","✯","⁕", "*", "~")
+          org-tags-column 80)
+    (add-to-list 'org-modules 'org-habit t))
+
+(use-package haskell-mode
+  :config
+    (defun haskell-as ()
+      (haskell-process-load-or-reload)
+      (haskell-interactive-bring))
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+    (add-hook 'haskell-mode-hook 'haskell-as)
+    (define-key haskell-mode-map (kbd "C-c C-c") 'haskell-process-load-or-reload)
+    (define-key haskell-mode-map (kbd "space o r") 'haskell-interactive-bring)
+    (define-key haskell-mode-map (kbd "K") 'haskell-hoogle)
+    (define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
+    (define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
+    (custom-set-variables
+      '(haskell-font-lock-symbols (quote unicode))
+      ;; '(haskell-mode-hook
+      ;;   (quote
+      ;;     (linum-mode turn-on-haskell-indentation turn-on-haskell-doc-mode)) t)
+      '(haskell-process-auto-import-loaded-modules t)
+      '(haskell-process-load-or-reload-prompt t)
+      '(haskell-process-log nil)
+      '(haskell-process-suggest-language-pragmas nil)
+      '(haskell-process-suggest-no-warn-orphans t)
+      '(haskell-tags-on-save t)))
+
+(use-package hindent
+  :hook (haskell-mode . hindent-mode)
+  :config
+    (setq hindent-reformat-buffer-on-save t
+          hindent-style "johan-tibell"))
 
 
 ;; (add-hook 'python-mode-hook 'anaconda-mode)
-
-
-;; tree sctructure panel
-;; (use-package treemacs
-;;   :config
-;;     (semantic-mode)
-;;     (setq-local imenu-create-index-function 'semantic-create-imenu-index-1)
-;;     (setq
-;;           treemacs-no-png-images t
-;;           treemacs-tag-follow-mode t
-;;           treemacs-tag-follow-cleanup t
-;;           treemacs-goto-tag-strategy 'refetch-index)
-;;     (treemacs-follow-mode t)
-;;     (treemacs-filewatch-mode t)
-;;     (treemacs-fringe-indicator-mode t)
-;;     (treemacs-create-theme "TESTING"
-;;       :icon-directory ""
-;;       :config
-;;         (progn
-;;           ; ⌥  ⎇
-;;           (treemacs-create-icon :file "j.png"   :fallback "⌥ " :extensions (root))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗀 " :extensions (dir-closed))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗁 " :extensions (dir-open))
-;;           (treemacs-create-icon :file "j.png" :fallback "◉ " :extensions (tag-closed))
-;;           (treemacs-create-icon :file "j.png" :fallback "◎ " :extensions (tag-open))
-;;           (treemacs-create-icon :file "j.png" :fallback "~ " :extensions (tag-leaf))
-;;           (treemacs-create-icon :file "j.png" :fallback "🗎  " :extensions (fallback))
-;;           ))
-;;     (treemacs-load-theme "TESTING")
-;;   )

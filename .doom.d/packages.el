@@ -13,6 +13,11 @@
 (package! undo-tree)
 (package! imenu-list)
 
+(package! haskell-mode)
+(package! hindent)
+(package! company-ghci)
+(package! ghci-completion)
+
 ;; For personal modeline
 (package! anzu)
 (package! evil-anzu)
