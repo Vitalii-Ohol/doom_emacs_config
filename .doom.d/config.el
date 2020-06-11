@@ -1,25 +1,12 @@
+;;; package --- Summary
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-(defun move-line-up ()
-  "Move up the current line."
-  (interactive)
-  (transpose-lines 1)
-  (forward-line -2)
-  (indent-according-to-mode))
+;;; Commentary:
 
-(defun move-line-down ()
-  "Move down the current line."
-  (interactive)
-  (forward-line 1)
-  (transpose-lines 1)
-  (forward-line -1)
-  (indent-according-to-mode))
+;;; Code:
 
-
-(global-set-key (kbd "M-k") 'move-line-up)
-(global-set-key (kbd "M-j") 'move-line-down)
-(global-set-key (kbd "C-/") 'comment-or-uncomment-region)
-
+(setq user-full-name "Vitalii Ohol"
+      user-mail-address "ohol.vitaliy@gmail.com")
 
 (setq use-package-verbose t
       use-package-compute-statistics t)
@@ -86,19 +73,32 @@
 
 ;; Setting the indent guides to show a specific character
 (use-package highlight-indent-guides
-    :commands highlight-indent-guides-mode
     :hook (prog-mode . highlight-indent-guides-mode)
     :config
-    (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-character ?\┆
-        highlight-indent-guides-delay 0.01
-        highlight-indent-guides-responsive 'top
-        highlight-indent-guides-auto-enabled nil))
+      (setq highlight-indent-guides-method 'character
+          highlight-indent-guides-character ?\┆
+          highlight-indent-guides-delay 0.01
+          highlight-indent-guides-responsive 'top
+          highlight-indent-guides-auto-enabled nil)
+    )
 
 (use-package evil-surround
   :config
     (global-evil-surround-mode 1)
     (push '(?< . ("< " . " >")) evil-surround-pairs-alist))
+
+(use-package evil-nerd-commenter
+  :config
+    (defun comment-or-uncomment-region-or-line ()
+      "Comments or uncomments the region or the current line if there's no active region."
+      (interactive)
+      (let (beg end)
+        (if (region-active-p)
+            (setq beg (region-beginning) end (region-end))
+            (setq beg (line-beginning-position) end (line-end-position)))
+        (comment-or-uncomment-region beg end)))
+    (map! :leader
+          :g "/" 'comment-or-uncomment-region-or-line))
 
 ;;which-key integration
 (use-package which-key
@@ -145,12 +145,16 @@
 
 (use-package iedit
   :config
-    (map! :leader
+    (map!
+        :leader
         (:prefix ("r" . "Remove/Replace")
-          :desc "Iedit" "i" 'iedit-mode
-          :desc "Iedit quit" "q" 'iedit-quit
-          :desc "Iedit quit" "t" 'iedit-toggle-selection
-        )))
+          :desc "iedit" "i" 'iedit-mode
+        ))
+    (map!
+       :map iedit-mode-keymap
+       :g "C-c C-c" 'iedit-toggle-selection)
+    ;; (define-key iedit-mode-keymap (kbd "C-c C-c") 'iedit-toggle-selection))
+    )
 
 ;; smartparens
 (after! smartparens
@@ -191,11 +195,11 @@
     (set-popup-rule! " \\*undo-tree\\*"
         :slot 2
         :side 'left
-        :size 60
+        :size 30
         :modeline nil
         :select t
         :quit t)
-    :commands (undo-tree-visualize))
+  :commands (undo-tree-visualize))
 
 ;; completion ivy
 (use-package ivy
@@ -238,7 +242,7 @@
   :commands (yas-global-mode))
 
 (use-package company
-  :after yasnippet
+  :after (yasnippet haskell-mode company-lsp)
   :config
     (setq company-selection-wrap-around nil
           ;; do or don't automatically start completion after <idle time>
@@ -254,11 +258,11 @@
           company-search-regexp-function #'company-search-flex-regexp
           company-require-match nil
           )
-    (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-files company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(python-mode) '(company-lsp company-files company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(haskell-mode) '(company-ghci company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(sh-mode) '(company-capf company-files company-yasnippet company-dabbrev-code))
-    (set-company-backend! '(org-mode) '(company-capf company-files company-yasnippet company-dabbrev))
+    (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-keywords company-semantic company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(python-mode) '(company-lsp company-keywords company-semantic company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(haskell-mode) '(company-ghci company-keywords company-semantic company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(sh-mode) '(company-capf company-keywords company-semantic company-files company-yasnippet company-dabbrev-code))
+    (set-company-backend! '(org-mode) '(company-capf company-keywords company-semantic company-files company-yasnippet company-dabbrev))
     (set-lookup-handlers! 'python-mode
       :definition #'lsp-ui-peek-find-definitions
       :references #'lsp-ui-peek-find-references)
@@ -304,6 +308,7 @@
           lsp-ui-flycheck-enable 1)
     (add-to-list 'lsp-ui-doc-frame-parameters '(left-fringe . 0))
   :commands lsp-ui-mode)
+
 (use-package company-lsp
   :after (lsp-mode)
   :config
@@ -332,7 +337,10 @@
                 line-end))
           :modes (text-mode markdown-mode gfm-mode org-mode))
     (add-to-list 'flycheck-checkers 'proselint)
-    ;; 'haskell-hlint 'sh-posix-bash 'sh-checkbashisms 'sh-shellcheck)
+    (add-to-list 'flycheck-checkers 'haskell-hlint)
+    (add-to-list 'flycheck-checkers 'sh-posix-bash)
+    (add-to-list 'flycheck-checkers 'sh-checkbashisms)
+    (add-to-list 'flycheck-checkers 'sh-shellcheck)
     (setq flycheck-check-syntax-automatically '(mode-enabled save)))
 (use-package flycheck-checkbashisms
   :after flycheck
@@ -365,23 +373,40 @@
 (use-package haskell-mode
   :config
     (defun haskell-as ()
-      (haskell-process-load-or-reload)
-      (haskell-interactive-bring))
+      (interactive)
+      (progn
+        (haskell-process-load-or-reload)
+        (haskell-interactive-bring)))
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
     (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-    (add-hook 'haskell-mode-hook 'haskell-as)
-    (define-key haskell-mode-map (kbd "C-c C-c") 'haskell-process-load-or-reload)
-    (define-key haskell-mode-map (kbd "space o r") 'haskell-interactive-bring)
-    (define-key haskell-mode-map (kbd "K") 'haskell-hoogle)
-    (define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
-    (define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
+
+    (map!
+        :map haskell-mode-map
+        :leader
+        (:prefix ("o" . "open")
+          :desc "repl" "r" 'haskell-interactive-bring
+        )
+        (:prefix ("c" . "code")
+          :desc "format imports" "i" 'haskell-mode-format-imports
+          :desc "compile" "c" 'haskell-compile
+          :desc "Recompile" "C" 'haskell-compile
+          :desc "execute (send to REPL)" "a" 'haskell-as
+          :desc "rename (iedit)" "r" 'iedit-mode
+          :desc "Jump to definition" "d" 'haskell-mode-jump-to-def-or-tag
+          :desc "" "D" nil
+          :desc "" "E" nil
+          :desc "send to REPL" "s" 'haskell-as
+          :desc "show uses" "u" 'haskell-mode-find-uses
+        ))
+    (map!
+     :map haskell-mode-map
+     :n "C-c C-c" 'haskell-as
+     :n "K" 'haskell-hoogle)
+
     (custom-set-variables
-      '(haskell-font-lock-symbols (quote unicode))
-      ;; '(haskell-mode-hook
-      ;;   (quote
-      ;;     (linum-mode turn-on-haskell-indentation turn-on-haskell-doc-mode)) t)
+      '(haskell-font-lock-symbols nil)
       '(haskell-process-auto-import-loaded-modules t)
-      '(haskell-process-load-or-reload-prompt t)
+      '(haskell-process-load-or-reload-prompt nil)
       '(haskell-process-log nil)
       '(haskell-process-suggest-language-pragmas nil)
       '(haskell-process-suggest-no-warn-orphans t)
@@ -392,6 +417,3 @@
   :config
     (setq hindent-reformat-buffer-on-save t
           hindent-style "johan-tibell"))
-
-
-;; (add-hook 'python-mode-hook 'anaconda-mode)
