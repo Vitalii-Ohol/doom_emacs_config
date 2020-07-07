@@ -258,6 +258,8 @@
           company-search-regexp-function #'company-search-flex-regexp
           company-require-match nil
           )
+    (set-company-backend! '(text-mode) '(company-capf company-abbrev company-dabbrev company-semantic))
+    (set-company-backend! '(prog-mode) '(company-capf company-abbrev company-complete  company-dabbrev company-semantic))
     (set-company-backend! '(emacs-lisp-mode) '(company-elisp company-keywords company-semantic company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(python-mode) '(company-lsp company-keywords company-semantic company-files company-yasnippet company-dabbrev-code))
     (set-company-backend! '(haskell-mode) '(company-ghci company-keywords company-semantic company-yasnippet company-dabbrev-code))
@@ -358,6 +360,10 @@
     (setq flycheck-pycheckers-checkers '(flake8 pylint pyflakes mypy3 bandit pep8)
           flycheck-pycheckers-max-line-length 79)
     (add-hook! 'flycheck-mode-hook #'flycheck-pycheckers-setup))
+
+(use-package ledger-mode
+  :hook flymake-mode)
+
 
 ;; org
 (use-package org

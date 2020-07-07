@@ -18,6 +18,9 @@
 (package! company-ghci)
 (package! ghci-completion)
 
+(package! ledger-mode)
+
+
 ;; For personal modeline
 (package! anzu)
 (package! evil-anzu)
